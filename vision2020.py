@@ -2,6 +2,7 @@ import libjevois as jevois
 import cv2
 import numpy as np
 import math
+import json
 
 ## detect high goal... better
 #
@@ -76,9 +77,17 @@ class DetectHighGoal2:
             offset_angle = self.get_offset_angle(self.centerX)
             distance = self.calculate_distance(self.focal_length, pixel_width, self.actual_width) - 4
             
-            jevois.sendSerial("Distance: " + str(distance))
-            jevois.sendSerial("Offset Angle: " + str(offset_angle))
-            outframe.sendCv(img)
+            vision_data = {"Distance:":distance, "Offset_angle:": offset_angle}
+            json_vision_data = json.dumps(vision_data)
+            
+            jevois.sendSerial(json_vision_data)
+        else:
+          vision_data = {"Error":"No targets found"}
+          json_vison_data = json.dumps(vision_data)
+
+          jevois.sendSerial(json_vison_data)
+            
+        outframe.sendCv(img)
             
     def calculate_distance(self, focal_len, pix_width, act_width):
         return (focal_len*act_width)/pix_width
